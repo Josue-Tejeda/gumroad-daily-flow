@@ -38,47 +38,50 @@ export async function generateReport(theme: DailyTheme, outputDir: string, dayIn
   
   let data: ReportData;
 
+  const fallbackData: ReportData = {
+    title: `The Future of ${niche}: A Daily Study`,
+    executiveSummary: `This executive summary outlines the major shifts occurring in the ${niche} sector. As modern aesthetics adapt, we see a blending of design principles and structural efficiency. This daily report provides a detailed synthesis of these trends.`,
+    metrics: [
+      { label: 'Projected Growth Rate', value: '+18.4% YoY' },
+      { label: 'Consumer Sentiment Index', value: '84.2 / 100' }
+    ],
+    trends: [
+      {
+        title: 'Hyper-Personalization of Content',
+        tagline: 'Tailoring user experiences dynamically to individual preferences.',
+        description: 'Modern platforms are shifting from broad category matching to continuous hyper-personalized recommendation streams. By leveraging low-latency data loops, services can adapt visual layouts and text styles to the user\'s real-time mood.',
+        implication: 'Businesses must build modular asset architectures that support real-time rendering and assembly.'
+      },
+      {
+        title: 'Decentralized Workspaces',
+        tagline: 'The migration from central hubs to distributed design systems.',
+        description: 'Collaboration is no longer locked to a single physical office or desktop file. Distributed git-based and cloud-native workflows have democratized digital resource sharing, requiring creators to design assets that translate across various devices.',
+        implication: 'Optimizing file delivery and establishing consistent visual design tokens is now mandatory.'
+      },
+      {
+        title: 'Sustainably Manufactured Digital Products',
+        tagline: 'Reducing the carbon and computational footprint of cloud assets.',
+        description: 'As generative AI adoption scales, the energy cost of rendering high-fidelity assets is facing closer scrutiny. Organizations are seeking lighter models and pre-compiled assets to minimize network transfer costs.',
+        implication: 'Optimize image sizing and use native CSS layouts rather than rendering large raster images.'
+      }
+    ],
+    recommendations: [
+      { title: 'Standardize Design Tokens', action: 'Integrate CSS custom properties for theme colors to enable instant visual adaptations.' },
+      { title: 'Optimize PDF File Weights', action: 'Ensure background styles use efficient gradients and minimize embedded heavy images.' },
+      { title: 'Publish Cohesive Daily Collections', action: 'Group assets around a central daily aesthetic theme to increase customer basket size.' },
+      { title: 'Establish Safe Fallbacks', action: 'Ensure all critical user flows have safe offline or default fallbacks if external APIs fail.' },
+      { title: 'Enforce Accessibility Standards', action: 'Verify contrast ratios programmatically to ensure all generated text meets WCAG AA 4.5:1 ratio.' }
+    ],
+    quote: 'Efficiency is doing things right; effectiveness is doing the right things.'
+  };
+
   if (!GEMINI_API_KEY) {
     console.warn('GEMINI_API_KEY is not defined. Using mock data for trend report.');
-    data = {
-      title: `The Future of ${niche}: A Daily Study`,
-      executiveSummary: `This executive summary outlines the major shifts occurring in the ${niche} sector. As modern aesthetics adapt, we see a blending of design principles and structural efficiency. This daily report provides a detailed synthesis of these trends.`,
-      metrics: [
-        { label: 'Projected Growth Rate', value: '+18.4% YoY' },
-        { label: 'Consumer Sentiment Index', value: '84.2 / 100' }
-      ],
-      trends: [
-        {
-          title: 'Hyper-Personalization of Content',
-          tagline: 'Tailoring user experiences dynamically to individual preferences.',
-          description: 'Modern platforms are shifting from broad category matching to continuous hyper-personalized recommendation streams. By leveraging low-latency data loops, services can adapt visual layouts and text styles to the user\'s real-time mood.',
-          implication: 'Businesses must build modular asset architectures that support real-time rendering and assembly.'
-        },
-        {
-          title: 'Decentralized Workspaces',
-          tagline: 'The migration from central hubs to distributed design systems.',
-          description: 'Collaboration is no longer locked to a single physical office or desktop file. Distributed git-based and cloud-native workflows have democratized digital resource sharing, requiring creators to design assets that translate across various devices.',
-          implication: 'Optimizing file delivery and establishing consistent visual design tokens is now mandatory.'
-        },
-        {
-          title: 'Sustainably Manufactured Digital Products',
-          tagline: 'Reducing the carbon and computational footprint of cloud assets.',
-          description: 'As generative AI adoption scales, the energy cost of rendering high-fidelity assets is facing closer scrutiny. Organizations are seeking lighter models and pre-compiled assets to minimize network transfer costs.',
-          implication: 'Optimize image sizing and use native CSS layouts rather than rendering large raster images.'
-        }
-      ],
-      recommendations: [
-        { title: 'Standardize Design Tokens', action: 'Integrate CSS custom properties for theme colors to enable instant visual adaptations.' },
-        { title: 'Optimize PDF File Weights', action: 'Ensure background styles use efficient gradients and minimize embedded heavy images.' },
-        { title: 'Publish Cohesive Daily Collections', action: 'Group assets around a central daily aesthetic theme to increase customer basket size.' },
-        { title: 'Establish Safe Fallbacks', action: 'Ensure all critical user flows have safe offline or default fallbacks if external APIs fail.' },
-        { title: 'Enforce Accessibility Standards', action: 'Verify contrast ratios programmatically to ensure all generated text meets WCAG AA 4.5:1 ratio.' }
-      ],
-      quote: 'Efficiency is doing things right; effectiveness is doing the right things.'
-    };
+    data = fallbackData;
   } else {
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-    const prompt = `You are a professional market analyst and senior research consultant. Generate a highly detailed, premium market trend report for the niche: "${niche}".
+    try {
+      const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+      const prompt = `You are a professional market analyst and senior research consultant. Generate a highly detailed, premium market trend report for the niche: "${niche}".
 The theme/aesthetic style of the report is "${theme.name}" which is described as: ${theme.description}.
 
 Generate the content and return a JSON response matching the schema. Give real, insightful, and publication-ready content (no placeholders, no generic text).
@@ -94,66 +97,70 @@ The report must include:
 5. Exactly 5 actionable recommendations for creators, professionals, or businesses looking to capitalize on this.
 6. A memorable industry quote or key takeaway.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            title: { type: 'STRING', description: 'Catchy, professional title for the report' },
-            executiveSummary: { type: 'STRING', description: 'High-level summary of the report contents and findings' },
-            metrics: {
-              type: 'ARRAY',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  label: { type: 'STRING', description: 'Description of the metric (e.g., Projected Market Valuation)' },
-                  value: { type: 'STRING', description: 'Percentage or value (e.g., +24.5% YoY)' }
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              title: { type: 'STRING', description: 'Catchy, professional title for the report' },
+              executiveSummary: { type: 'STRING', description: 'High-level summary of the report contents and findings' },
+              metrics: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    label: { type: 'STRING', description: 'Description of the metric (e.g., Projected Market Valuation)' },
+                    value: { type: 'STRING', description: 'Percentage or value (e.g., +24.5% YoY)' }
+                  },
+                  required: ['label', 'value']
                 },
-                required: ['label', 'value']
+                description: 'Exactly 2 market metrics or statistics'
               },
-              description: 'Exactly 2 market metrics or statistics'
-            },
-            trends: {
-              type: 'ARRAY',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  title: { type: 'STRING', description: 'Title of the trend' },
-                  tagline: { type: 'STRING', description: 'One-sentence summary of the trend' },
-                  description: { type: 'STRING', description: 'Detailed 1-2 paragraph description of the trend' },
-                  implication: { type: 'STRING', description: 'Direct business or strategic implication of the trend' }
+              trends: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    title: { type: 'STRING', description: 'Title of the trend' },
+                    tagline: { type: 'STRING', description: 'One-sentence summary of the trend' },
+                    description: { type: 'STRING', description: 'Detailed 1-2 paragraph description of the trend' },
+                    implication: { type: 'STRING', description: 'Direct business or strategic implication of the trend' }
+                  },
+                  required: ['title', 'tagline', 'description', 'implication']
                 },
-                required: ['title', 'tagline', 'description', 'implication']
+                description: 'Exactly 3 core industry trends'
               },
-              description: 'Exactly 3 core industry trends'
-            },
-            recommendations: {
-              type: 'ARRAY',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  title: { type: 'STRING', description: 'Action title (e.g., Optimize Mobile Checkout)' },
-                  action: { type: 'STRING', description: 'Detailed instruction on how to execute this action' }
+              recommendations: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    title: { type: 'STRING', description: 'Action title (e.g., Optimize Mobile Checkout)' },
+                    action: { type: 'STRING', description: 'Detailed instruction on how to execute this action' }
+                  },
+                  required: ['title', 'action']
                 },
-                required: ['title', 'action']
+                description: 'Exactly 5 actionable recommendations'
               },
-              description: 'Exactly 5 actionable recommendations'
+              quote: { type: 'STRING', description: 'Key takeaway quote' }
             },
-            quote: { type: 'STRING', description: 'Key takeaway quote' }
-          },
-          required: ['title', 'executiveSummary', 'metrics', 'trends', 'recommendations', 'quote']
+            required: ['title', 'executiveSummary', 'metrics', 'trends', 'recommendations', 'quote']
+          }
         }
+      });
+
+      if (!response.text) {
+        throw new Error('Gemini API returned an empty response for the trend report.');
       }
-    });
 
-    if (!response.text) {
-      throw new Error('Gemini API returned an empty response for the trend report.');
+      data = JSON.parse(response.text) as ReportData;
+    } catch (err) {
+      console.warn('Failed to generate trend report with Gemini API. Falling back to high-quality default data.', err);
+      data = fallbackData;
     }
-
-    data = JSON.parse(response.text) as ReportData;
   }
 
   // Compute contrast-safe text colors against the white (#ffffff) page background
@@ -441,7 +448,7 @@ The report must include:
     </div>
     
     <footer>
-      🤖 Coordinated Daily Suite • Powered by Gemini 2.5 Pro • Uncompromising Digital Asset Design
+      🤖 Coordinated Daily Suite • Powered by Gemini 2.5 Flash • Uncompromising Digital Asset Design
     </footer>
   </div>
 </body>

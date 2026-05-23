@@ -31,7 +31,7 @@ The theme must be creative and feel premium. Return the response matching the sp
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',

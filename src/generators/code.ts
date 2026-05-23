@@ -15,12 +15,10 @@ export async function generateCode(theme: DailyTheme, outputDir: string): Promis
 
   let files: GeneratedFile[];
 
-  if (!GEMINI_API_KEY) {
-    console.warn('GEMINI_API_KEY is not defined. Using mock files for code kit.');
-    files = [
-      {
-        filename: 'README.md',
-        content: `# Cohesive Developer UI Asset - ${theme.name}
+  const fallbackFiles: GeneratedFile[] = [
+    {
+      filename: 'README.md',
+      content: `# Cohesive Developer UI Asset - ${theme.name}
 
 This developer asset is part of the coordinated daily collection matching the theme **${theme.name}**.
 
@@ -36,10 +34,10 @@ This developer asset is part of the coordinated daily collection matching the th
 - Background: \`${theme.colors.background}\`
 - Text: \`${theme.colors.text}\`
 `
-      },
-      {
-        filename: 'ThemeStyles.css',
-        content: `:root {
+    },
+    {
+      filename: 'ThemeStyles.css',
+      content: `:root {
   --primary-color: ${theme.colors.primary};
   --secondary-color: ${theme.colors.secondary};
   --accent-color: ${theme.colors.accent};
@@ -72,18 +70,23 @@ This developer asset is part of the coordinated daily collection matching the th
   cursor: pointer;
 }
 `
-      },
-      {
-        filename: 'theme.json',
-        content: JSON.stringify({
-          name: theme.name,
-          palette: theme.colors
-        }, null, 2)
-      }
-    ];
+    },
+    {
+      filename: 'theme.json',
+      content: JSON.stringify({
+        name: theme.name,
+        palette: theme.colors
+      }, null, 2)
+    }
+  ];
+
+  if (!GEMINI_API_KEY) {
+    console.warn('GEMINI_API_KEY is not defined. Using mock files for code kit.');
+    files = fallbackFiles;
   } else {
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-    const prompt = `You are a Senior Full-Stack Engineer. Create a cohesive, premium developer asset (e.g., a complete React dashboard component, a Tailwind UI widget card, or an interactive animation helper script) matching the theme "${theme.name}" (described as: ${theme.description}).
+    try {
+      const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+      const prompt = `You are a Senior Full-Stack Engineer. Create a cohesive, premium developer asset (e.g., a complete React dashboard component, a Tailwind UI widget card, or an interactive animation helper script) matching the theme "${theme.name}" (described as: ${theme.description}).
 The aesthetic styling details are: ${theme.aesthetic}.
 The colors to integrate are:
 - Primary (${theme.colors.primary})
@@ -100,37 +103,41 @@ You must include:
 
 Do not write placeholders, dummy comments, or generic print statements. The code must be complete, modular, and immediately usable by professional developers.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            files: {
-              type: 'ARRAY',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  filename: { type: 'STRING', description: 'Relative path and filename, e.g. "Button.jsx" or "styles/theme.css"' },
-                  content: { type: 'STRING', description: 'Full code or text content of the file' }
-                },
-                required: ['filename', 'content']
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              files: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    filename: { type: 'STRING', description: 'Relative path and filename, e.g. "Button.jsx" or "styles/theme.css"' },
+                    content: { type: 'STRING', description: 'Full code or text content of the file' }
+                  },
+                  required: ['filename', 'content']
+                }
               }
-            }
-          },
-          required: ['files']
+            },
+            required: ['files']
+          }
         }
+      });
+
+      if (!response.text) {
+        throw new Error('Gemini API returned an empty response for code generation.');
       }
-    });
 
-    if (!response.text) {
-      throw new Error('Gemini API returned an empty response for code generation.');
+      const parsed = JSON.parse(response.text) as { files: GeneratedFile[] };
+      files = parsed.files;
+    } catch (err) {
+      console.warn('Failed to generate code kit with Gemini API. Falling back to default files.', err);
+      files = fallbackFiles;
     }
-
-    const parsed = JSON.parse(response.text) as { files: GeneratedFile[] };
-    files = parsed.files;
   }
 
   try {

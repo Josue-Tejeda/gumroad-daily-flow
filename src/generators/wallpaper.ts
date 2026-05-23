@@ -38,10 +38,10 @@ No text, no watermarks, no signatures. Aspect ratio 16:9. Color scheme: ${theme.
 
   if (GEMINI_API_KEY) {
     try {
-      console.log('Expanding wallpaper prompt using Gemini 2.5 Pro...');
+      console.log('Expanding wallpaper prompt using Gemini 2.5 Flash...');
       const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
       const expansionResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-2.5-flash',
         contents: `You are an expert prompt designer for state-of-the-art text-to-image models like FLUX.1. Expand the daily theme into a highly descriptive, visually rich prompt for generating a premium desktop wallpaper.
 Theme: ${theme.name}
 Description: ${theme.description}

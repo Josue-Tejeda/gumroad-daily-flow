@@ -32,49 +32,52 @@ export async function generatePrompts(theme: DailyTheme, outputDir: string): Pro
   
   let data: PromptsData;
 
+  const fallbackData: PromptsData = {
+    title: `${theme.name} AI Prompt Recipes`,
+    introduction: `This guide provides optimized prompt recipes for text and image models matching the ${theme.name} aesthetic. Use these prompts to streamline content generation and visual asset creation.`,
+    textPrompts: [
+      {
+        title: 'Marketing Content Creator',
+        role: 'Creative Copywriter',
+        promptText: 'Act as a professional copywriter. Write a 300-word marketing campaign description for [Product Name] using the visual tone and key terms from the aesthetic: [Aesthetic Description]. Enforce high-converting structures and an engaging call-to-action.',
+        instructions: 'Replace [Product Name] with your brand name, and insert the daily theme description into [Aesthetic Description] for tailored copy.'
+      },
+      {
+        title: 'System Architecture Architect',
+        role: 'Senior Software Engineer',
+        promptText: 'Design a scalable file storage pipeline in TypeScript for [Niche/Category]. The solution should use cloud storage buckets, support ZIP bundling, and run on a daily cron schedule. Provide clean, modular code with documentation.',
+        instructions: 'Fill in [Niche/Category] with your specific industry topic (e.g. Graphic Design Assets or Personal Finance logs).'
+      },
+      {
+        title: 'Daily Task Optimizer',
+        role: 'Personal Productivity Coach',
+        promptText: 'Analyze my top 3 daily goals: [Goal 1], [Goal 2], [Goal 3]. Outline a step-by-step hourly schedule to execute them efficiently, incorporating short breaks and reflections.',
+        instructions: 'List your actual high-priority focus tasks to generate a customized, actionable daily routine schedule.'
+      }
+    ],
+    imagePrompts: [
+      {
+        title: 'Sleek Aesthetic Wallpaper',
+        promptText: `A premium, ultra-high-resolution desktop wallpaper, theme: "${theme.name}". Visual style: clean digital art, modern composition, cinematic lighting, masterpiece, high details. Color scheme: ${theme.colors.primary}, ${theme.colors.secondary}, with ${theme.colors.accent} highlights.`,
+        parameters: '--ar 16:9 --style raw --v 6.0',
+        tips: 'Adjust the theme colors to shift the primary tones, or add specific visual subjects like "geometric wireframes" to the prompt.'
+      },
+      {
+        title: 'Modern UI Mockup Design',
+        promptText: `A sleek mobile app user interface dashboard design. Clean minimal layout, glassmorphic card containers, vivid colors matching ${theme.colors.secondary} and ${theme.colors.accent} on a deep background.`,
+        parameters: '--ar 9:16 --v 6.0',
+        tips: 'Replace "mobile app" with "desktop web app" to change the layout device frame constraints.'
+      }
+    ]
+  };
+
   if (!GEMINI_API_KEY) {
     console.warn('GEMINI_API_KEY is not defined. Using mock data for prompts guide.');
-    data = {
-      title: `${theme.name} AI Prompt Recipes`,
-      introduction: `This guide provides optimized prompt recipes for text and image models matching the ${theme.name} aesthetic. Use these prompts to streamline content generation and visual asset creation.`,
-      textPrompts: [
-        {
-          title: 'Marketing Content Creator',
-          role: 'Creative Copywriter',
-          promptText: 'Act as a professional copywriter. Write a 300-word marketing campaign description for [Product Name] using the visual tone and key terms from the aesthetic: [Aesthetic Description]. Enforce high-converting structures and an engaging call-to-action.',
-          instructions: 'Replace [Product Name] with your brand name, and insert the daily theme description into [Aesthetic Description] for tailored copy.'
-        },
-        {
-          title: 'System Architecture Architect',
-          role: 'Senior Software Engineer',
-          promptText: 'Design a scalable file storage pipeline in TypeScript for [Niche/Category]. The solution should use cloud storage buckets, support ZIP bundling, and run on a daily cron schedule. Provide clean, modular code with documentation.',
-          instructions: 'Fill in [Niche/Category] with your specific industry topic (e.g. Graphic Design Assets or Personal Finance logs).'
-        },
-        {
-          title: 'Daily Task Optimizer',
-          role: 'Personal Productivity Coach',
-          promptText: 'Analyze my top 3 daily goals: [Goal 1], [Goal 2], [Goal 3]. Outline a step-by-step hourly schedule to execute them efficiently, incorporating short breaks and reflections.',
-          instructions: 'List your actual high-priority focus tasks to generate a customized, actionable daily routine schedule.'
-        }
-      ],
-      imagePrompts: [
-        {
-          title: 'Sleek Aesthetic Wallpaper',
-          promptText: `A premium, ultra-high-resolution desktop wallpaper, theme: "${theme.name}". Visual style: clean digital art, modern composition, cinematic lighting, masterpiece, high details. Color scheme: ${theme.colors.primary}, ${theme.colors.secondary}, with ${theme.colors.accent} highlights.`,
-          parameters: '--ar 16:9 --style raw --v 6.0',
-          tips: 'Adjust the theme colors to shift the primary tones, or add specific visual subjects like "geometric wireframes" to the prompt.'
-        },
-        {
-          title: 'Modern UI Mockup Design',
-          promptText: `A sleek mobile app user interface dashboard design. Clean minimal layout, glassmorphic card containers, vivid colors matching ${theme.colors.secondary} and ${theme.colors.accent} on a deep background.`,
-          parameters: '--ar 9:16 --v 6.0',
-          tips: 'Replace "mobile app" with "desktop web app" to change the layout device frame constraints.'
-        }
-      ]
-    };
+    data = fallbackData;
   } else {
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-    const prompt = `You are a Professional Prompt Engineer and AI Consultant. Generate a highly valuable, professional AI Prompt Guide & Recipe Pack matching the theme: "${theme.name}" (described as: ${theme.description}).
+    try {
+      const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+      const prompt = `You are a Professional Prompt Engineer and AI Consultant. Generate a highly valuable, professional AI Prompt Guide & Recipe Pack matching the theme: "${theme.name}" (described as: ${theme.description}).
 The theme's aesthetic is described as: ${theme.aesthetic}.
 
 Generate the content and return a JSON response matching the schema. Write complete, detailed, and copy-pasteable prompts with bracketed placeholders (e.g., [Insert Topic]) that help creators and professionals get elite, production-quality results. Do not write generic short prompts.
@@ -85,55 +88,59 @@ The pack must contain:
 3. Exactly 3 comprehensive text prompts (for ChatGPT, Claude, Gemini) covering system context, structured guidelines, and output formatting.
 4. Exactly 2 comprehensive image prompts (for Midjourney, DALL-E, Stable Diffusion, Flux) centered on the visual aesthetic. Include camera settings, styles, and lighting details.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            title: { type: 'STRING', description: 'Title of the prompt guide' },
-            introduction: { type: 'STRING', description: 'Brief introduction to the guide' },
-            textPrompts: {
-              type: 'ARRAY',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  title: { type: 'STRING', description: 'Descriptive title of the prompt (e.g. Content Strategy Planner)' },
-                  role: { type: 'STRING', description: 'System role or persona for the AI' },
-                  promptText: { type: 'STRING', description: 'The exact copy-pasteable prompt template (use [Bracketed Placeholders] for user inputs)' },
-                  instructions: { type: 'STRING', description: 'How to use, what to expect, and customized tips' }
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              title: { type: 'STRING', description: 'Title of the prompt guide' },
+              introduction: { type: 'STRING', description: 'Brief introduction to the guide' },
+              textPrompts: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    title: { type: 'STRING', description: 'Descriptive title of the prompt (e.g. Content Strategy Planner)' },
+                    role: { type: 'STRING', description: 'System role or persona for the AI' },
+                    promptText: { type: 'STRING', description: 'The exact copy-pasteable prompt template (use [Bracketed Placeholders] for user inputs)' },
+                    instructions: { type: 'STRING', description: 'How to use, what to expect, and customized tips' }
+                  },
+                  required: ['title', 'role', 'promptText', 'instructions']
                 },
-                required: ['title', 'role', 'promptText', 'instructions']
+                description: 'Exactly 3 text model prompts'
               },
-              description: 'Exactly 3 text model prompts'
+              imagePrompts: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    title: { type: 'STRING', description: 'Descriptive title (e.g. Minimalist Branding Mockup)' },
+                    promptText: { type: 'STRING', description: 'The exact image prompt' },
+                    parameters: { type: 'STRING', description: 'Model parameters like aspect ratio or quality flags (e.g. --ar 16:9 --v 6.0)' },
+                    tips: { type: 'STRING', description: 'Tips on modifying subject, style, or color inputs' }
+                  },
+                  required: ['title', 'promptText', 'parameters', 'tips']
+                },
+                description: 'Exactly 2 image model prompts'
+              }
             },
-            imagePrompts: {
-              type: 'ARRAY',
-              items: {
-                type: 'OBJECT',
-                properties: {
-                  title: { type: 'STRING', description: 'Descriptive title (e.g. Minimalist Branding Mockup)' },
-                  promptText: { type: 'STRING', description: 'The exact image prompt' },
-                  parameters: { type: 'STRING', description: 'Model parameters like aspect ratio or quality flags (e.g. --ar 16:9 --v 6.0)' },
-                  tips: { type: 'STRING', description: 'Tips on modifying subject, style, or color inputs' }
-                },
-                required: ['title', 'promptText', 'parameters', 'tips']
-              },
-              description: 'Exactly 2 image model prompts'
-            }
-          },
-          required: ['title', 'introduction', 'textPrompts', 'imagePrompts']
+            required: ['title', 'introduction', 'textPrompts', 'imagePrompts']
+          }
         }
+      });
+
+      if (!response.text) {
+        throw new Error('Gemini API returned an empty response for the prompts guide.');
       }
-    });
 
-    if (!response.text) {
-      throw new Error('Gemini API returned an empty response for the prompts guide.');
+      data = JSON.parse(response.text) as PromptsData;
+    } catch (err) {
+      console.warn('Failed to generate prompts guide with Gemini API. Falling back to high-quality default data.', err);
+      data = fallbackData;
     }
-
-    data = JSON.parse(response.text) as PromptsData;
   }
 
   // Compute contrast-safe colors
@@ -411,7 +418,7 @@ The pack must contain:
     </div>
     
     <footer>
-      🤖 Coordinated Daily Suite • Powered by Gemini 2.5 Pro • Uncompromising Digital Asset Design
+      🤖 Coordinated Daily Suite • Powered by Gemini 2.5 Flash • Uncompromising Digital Asset Design
     </footer>
   </div>
 </body>

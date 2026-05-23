@@ -3,7 +3,10 @@ name: Daily Gumroad Shop Generator
 on:
   schedule:
     - cron: '0 8 * * *' # Runs daily at 08:00 UTC (3:00 AM EST)
-  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write # Allows committing the generated assets back to the repo
@@ -11,18 +14,14 @@ permissions:
 jobs:
   run-generator:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - name: Install dependencies
