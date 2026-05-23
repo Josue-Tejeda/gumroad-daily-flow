@@ -7,15 +7,15 @@ import { GEMINI_API_KEY } from '../config';
 import { ensureContrast } from '../utils';
 
 export async function generatePlanner(theme: DailyTheme, outputDir: string): Promise<string> {
-  if (!GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not defined in environment variables.');
-  }
-
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-
   console.log(`Generating daily planner content for theme: "${theme.name}"...`);
 
-  const prompt = `You are a professional life organizer and graphic designer. Today's theme is: "${theme.name}" (described as: ${theme.description}).
+  let quote = 'Make today count, one step at a time.';
+  let gratitudePrompt = 'What is one thing you are grateful for today?';
+  let priorities = ['Focus on daily tasks', 'Keep a positive mindset', 'Align with your goals'];
+
+  if (GEMINI_API_KEY) {
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    const prompt = `You are a professional life organizer and graphic designer. Today's theme is: "${theme.name}" (described as: ${theme.description}).
 Generate theme-specific content for today's daily planner:
 1. A motivating daily quote or affirmation (1 short sentence) tailored to the theme.
 2. A creative gratitude prompt tailored to the theme (e.g., if theme is minimalist: "List one thing you can let go of to create mental space").
@@ -23,33 +23,28 @@ Generate theme-specific content for today's daily planner:
 
 Return the response matching the specified JSON schema.`;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            quote: { type: 'STRING', description: 'A daily quote or affirmation matching the theme' },
-            gratitudePrompt: { type: 'STRING', description: 'A customized gratitude prompt helper text' },
-            priorities: {
-              type: 'ARRAY',
-              items: { type: 'STRING' },
-              description: 'Exactly 3 suggested focus tasks or priorities matching the theme (brief, max 6 words each)'
-            }
-          },
-          required: ['quote', 'gratitudePrompt', 'priorities']
-        }
-      }
-    });
-
-    let quote = 'Make today count, one step at a time.';
-    let gratitudePrompt = 'What is one thing you are grateful for today?';
-    let priorities = ['Focus on daily tasks', 'Keep a positive mindset', 'Align with your goals'];
-
     try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-pro',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              quote: { type: 'STRING', description: 'A daily quote or affirmation matching the theme' },
+              gratitudePrompt: { type: 'STRING', description: 'A customized gratitude prompt helper text' },
+              priorities: {
+                type: 'ARRAY',
+                items: { type: 'STRING' },
+                description: 'Exactly 3 suggested focus tasks or priorities matching the theme (brief, max 6 words each)'
+              }
+            },
+            required: ['quote', 'gratitudePrompt', 'priorities']
+          }
+        }
+      });
+
       const parsed = JSON.parse(response.text || '{}');
       if (parsed.quote) quote = parsed.quote.trim();
       if (parsed.gratitudePrompt) gratitudePrompt = parsed.gratitudePrompt.trim();
@@ -57,9 +52,13 @@ Return the response matching the specified JSON schema.`;
         priorities = parsed.priorities.map((p: string) => p.trim());
       }
     } catch (err) {
-      console.warn('Failed to parse Gemini daily planner response. Using safe fallbacks.', err);
+      console.warn('Failed to generate or parse Gemini daily planner response. Using safe fallbacks.', err);
     }
+  } else {
+    console.warn('GEMINI_API_KEY is not defined. Using mock data fallbacks for daily planner.');
+  }
 
+  try {
     // Compute contrast-safe colors
     const primaryColor = ensureContrast(theme.colors.primary, '#ffffff', 4.5);
     const secondaryColor = ensureContrast(theme.colors.secondary, '#ffffff', 4.5);
@@ -411,30 +410,38 @@ Return the response matching the specified JSON schema.`;
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-    const page = await browser.newPage();
-    await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
     
-    // Output full bleed A4 page print with zero margin offset
-    await page.pdf({
-      path: outputPath,
-      format: 'A4',
-      margin: {
-        top: '0px',
-        bottom: '0px',
-        left: '0px',
-        right: '0px'
-      },
-      printBackground: true
-    });
+    try {
+      const page = await browser.newPage();
+      await page.setContent(fullHtml, { waitUntil: 'load' });
+      
+      try {
+        await page.evaluate(() => document.fonts.ready);
+      } catch (err) {
+        console.warn('Failed to wait for fonts to load in planner compiler:', err);
+      }
+      
+      // Output full bleed A4 page print with zero margin offset
+      await page.pdf({
+        path: outputPath,
+        format: 'A4',
+        margin: {
+          top: '0px',
+          bottom: '0px',
+          left: '0px',
+          right: '0px'
+        },
+        printBackground: true
+      });
 
-    await browser.close();
-    console.log(`Printable planner PDF compiled and saved to: ${outputPath}`);
-    return outputPath;
+      console.log(`Printable planner PDF compiled and saved to: ${outputPath}`);
+      return outputPath;
+    } finally {
+      await browser.close();
+    }
   } catch (error) {
     console.error('Failed to generate printable planner PDF:', error);
-    const outputPath = path.join(outputDir, 'printable-planner.pdf');
-    fs.writeFileSync(outputPath, 'Placeholder Printable Planner PDF Content');
-    return outputPath;
+    throw error;
   }
 }
 

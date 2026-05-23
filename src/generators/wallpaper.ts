@@ -6,8 +6,29 @@ import { DailyTheme } from '../types';
 import { FAL_KEY, GEMINI_API_KEY } from '../config';
 
 export async function generateWallpaper(theme: DailyTheme, outputDir: string): Promise<string> {
+  const outputPath = path.join(outputDir, 'wallpaper.png');
+
   if (!FAL_KEY) {
-    throw new Error('FAL_KEY is not defined in environment variables.');
+    console.warn('FAL_KEY is not defined in environment variables. Using fallback Unsplash wallpaper.');
+    try {
+      const placeholderUrl = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920&auto=format&fit=crop`;
+      const writer = fs.createWriteStream(outputPath);
+      const downloadResponse = await axios({
+        url: placeholderUrl,
+        method: 'GET',
+        responseType: 'stream'
+      });
+      downloadResponse.data.pipe(writer);
+      await new Promise<void>((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+      console.log(`Fallback wallpaper saved to: ${outputPath}`);
+      return outputPath;
+    } catch (fallbackError) {
+      console.error('Failed fallback Unsplash download:', fallbackError);
+      throw fallbackError;
+    }
   }
 
   let prompt = `A premium, ultra-high-resolution desktop wallpaper, theme: "${theme.name}". 
@@ -21,14 +42,21 @@ No text, no watermarks, no signatures. Aspect ratio 16:9. Color scheme: ${theme.
       const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
       const expansionResponse = await ai.models.generateContent({
         model: 'gemini-2.5-pro',
-        contents: `You are an expert prompt designer for text-to-image models. Expand the daily theme into a highly descriptive, visually rich prompt for FLUX.1.
+        contents: `You are an expert prompt designer for state-of-the-art text-to-image models like FLUX.1. Expand the daily theme into a highly descriptive, visually rich prompt for generating a premium desktop wallpaper.
 Theme: ${theme.name}
 Description: ${theme.description}
 Aesthetic: ${theme.aesthetic}
 Keywords: ${theme.keywords.join(', ')}
 Target Colors: Primary (${theme.colors.primary}), Secondary (${theme.colors.secondary}), Accent (${theme.colors.accent}).
 
-Write a single paragraph (100-150 words) describing a stunning, high-end desktop wallpaper. Use concrete visual details, specify composition, lighting (e.g. volumetric, cinematic), camera specs, and color tones. Do not include introductory text, just return the raw prompt. Explicitly state "no text, no watermarks, no signatures, aspect ratio 16:9".`
+Write a single paragraph (100-150 words) describing a stunning, professional-grade desktop wallpaper.
+Include details about:
+1. Subject & Scene: visual elements, composition, depth of field, perspective.
+2. Materials & Textures: e.g. polished chrome, brushed metals, frosted glass, organic elements, digital particles.
+3. Lighting & Atmosphere: e.g. volumetric neon glows, raytraced reflections, cinematic lighting, dramatic shadows.
+4. Render Quality: e.g. 8k, Octane Render style, Unreal Engine 5 aesthetic, clean 3D art, sleek vector shapes.
+5. Explicitly enforce the target color palette.
+Do not include introductory text, just return the raw prompt. Explicitly state at the end "no text, no watermarks, no signatures, aspect ratio 16:9".`
       });
 
       if (expansionResponse.text) {
@@ -69,7 +97,7 @@ Write a single paragraph (100-150 words) describing a stunning, high-end desktop
       throw new Error('No image URL returned from Fal.ai API.');
     }
 
-    const outputPath = path.join(outputDir, 'wallpaper.png');
+
     console.log(`Downloading wallpaper from Fal.ai: ${imageUrl}`);
     
     // Download image and save it
@@ -93,7 +121,7 @@ Write a single paragraph (100-150 words) describing a stunning, high-end desktop
     console.error('Failed to generate wallpaper:', error);
     
     // Create a fallback colored image in case of API failure (so the pipeline never crashes)
-    const outputPath = path.join(outputDir, 'wallpaper.png');
+
     console.log('Creating a fallback background file...');
     
     // We can write a simple SVG or text/png if we had canvas, or we can just download a public placeholder
@@ -116,10 +144,8 @@ Write a single paragraph (100-150 words) describing a stunning, high-end desktop
       console.log(`Fallback wallpaper saved to: ${outputPath}`);
       return outputPath;
     } catch (fallbackError) {
-      // Create empty file just to satisfy file checks
-      fs.writeFileSync(outputPath, 'Placeholder Wallpaper Content');
-      console.log(`Minimal dummy wallpaper saved to: ${outputPath}`);
-      return outputPath;
+      console.error('Failed both Fal.ai and fallback Unsplash download:', fallbackError);
+      throw fallbackError;
     }
   }
 }

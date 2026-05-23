@@ -85,18 +85,11 @@ async function run() {
     console.log(`\n[${asset.type.toUpperCase()}] Creating asset...`);
     
     let localFilePath = '';
-    if (isTest) {
-      // Simulate file creation with basic contents
-      localFilePath = path.join(assetsDir, asset.file);
-      fs.writeFileSync(localFilePath, `Mock generated data for ${asset.type} matching ${theme.name}`);
-      console.log(`Saved mock file to: ${localFilePath}`);
-    } else {
-      try {
-        localFilePath = await asset.generate();
-      } catch (err) {
-        console.error(`Error generating ${asset.type}, skipping:`, err);
-        continue;
-      }
+    try {
+      localFilePath = await asset.generate();
+    } catch (err) {
+      console.error(`Error generating ${asset.type}, skipping:`, err);
+      continue;
     }
 
     // Pre-calculate raw GitHub download link

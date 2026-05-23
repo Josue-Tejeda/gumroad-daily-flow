@@ -11,26 +11,95 @@ interface GeneratedFile {
 }
 
 export async function generateCode(theme: DailyTheme, outputDir: string): Promise<string> {
-  if (!GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not defined in environment variables.');
-  }
-
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-
   console.log(`Generating code kit for theme: "${theme.name}"...`);
 
-  const prompt = `You are a Senior Full-Stack Engineer. Create a cohesive developer asset (e.g., a React component, a CSS dashboard template, or an automation utility script) matching the theme "${theme.name}" (described as: ${theme.description}).
-The colors to integrate are: Primary (${theme.colors.primary}), Secondary (${theme.colors.secondary}), Accent (${theme.colors.accent}), Background (${theme.colors.background}), Text (${theme.colors.text}).
+  let files: GeneratedFile[];
+
+  if (!GEMINI_API_KEY) {
+    console.warn('GEMINI_API_KEY is not defined. Using mock files for code kit.');
+    files = [
+      {
+        filename: 'README.md',
+        content: `# Cohesive Developer UI Asset - ${theme.name}
+
+This developer asset is part of the coordinated daily collection matching the theme **${theme.name}**.
+
+## Features
+- Modular design styling.
+- Responsive layout.
+- Color variables matching theme palette.
+
+## Colors
+- Primary: \`${theme.colors.primary}\`
+- Secondary: \`${theme.colors.secondary}\`
+- Accent: \`${theme.colors.accent}\`
+- Background: \`${theme.colors.background}\`
+- Text: \`${theme.colors.text}\`
+`
+      },
+      {
+        filename: 'ThemeStyles.css',
+        content: `:root {
+  --primary-color: ${theme.colors.primary};
+  --secondary-color: ${theme.colors.secondary};
+  --accent-color: ${theme.colors.accent};
+  --background-color: ${theme.colors.background};
+  --text-color: ${theme.colors.text};
+}
+
+.theme-card {
+  background: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.theme-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-color);
+}
+
+.theme-btn {
+  background-color: var(--secondary-color);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+`
+      },
+      {
+        filename: 'theme.json',
+        content: JSON.stringify({
+          name: theme.name,
+          palette: theme.colors
+        }, null, 2)
+      }
+    ];
+  } else {
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    const prompt = `You are a Senior Full-Stack Engineer. Create a cohesive, premium developer asset (e.g., a complete React dashboard component, a Tailwind UI widget card, or an interactive animation helper script) matching the theme "${theme.name}" (described as: ${theme.description}).
+The aesthetic styling details are: ${theme.aesthetic}.
+The colors to integrate are:
+- Primary (${theme.colors.primary})
+- Secondary (${theme.colors.secondary})
+- Accent (${theme.colors.accent})
+- Background (${theme.colors.background})
+- Text (${theme.colors.text})
 
 Generate the code files. Your response must be in JSON matching the schema, containing a list of files with their filenames and contents.
-You must include at least:
-1. "README.md" explaining what the component is, how to run/use it, and listing the features.
-2. A main component or script file (e.g., "Component.jsx" or "script.js" or "styles.css").
-3. A configuration or helper file (e.g., "theme.json" or "utils.js").
+You must include:
+1. A detailed "README.md" written in a professional markdown style explaining the component, installation steps, configuration options, usage examples, and design system choices (including colors and theme inspiration).
+2. A main, fully functional code asset (e.g., "Component.jsx", "Widget.tsx", or "index.html") that is clean, fully styled, utilizes modern design paradigms (e.g., glassmorphism, smooth CSS transitions, hover states), and is ready to copy-paste into a real project.
+3. A styling or theme file (e.g., "theme.css", "tailwind.config.js", or "theme.json") defining CSS variables or configuration objects for all colors to make it easily themeable.
 
-Make the code functional, clean, and highly polished. Do not write dummy comments; write real code.`;
+Do not write placeholders, dummy comments, or generic print statements. The code must be complete, modular, and immediately usable by professional developers.`;
 
-  try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-pro',
       contents: prompt,
@@ -60,7 +129,11 @@ Make the code functional, clean, and highly polished. Do not write dummy comment
       throw new Error('Gemini API returned an empty response for code generation.');
     }
 
-    const { files } = JSON.parse(response.text) as { files: GeneratedFile[] };
+    const parsed = JSON.parse(response.text) as { files: GeneratedFile[] };
+    files = parsed.files;
+  }
+
+  try {
     const tempDir = path.join(outputDir, 'temp-code');
     
     if (!fs.existsSync(tempDir)) {
@@ -108,16 +181,6 @@ Make the code functional, clean, and highly polished. Do not write dummy comment
     return outputPath;
   } catch (error) {
     console.error('Failed to generate code zip:', error);
-    // Write a fallback zip
-    const outputPath = path.join(outputDir, 'code-boilerplate.zip');
-    
-    // Create dummy text zip
-    const output = fs.createWriteStream(outputPath);
-    const archive = archiver('zip', { zlib: { level: 1 } });
-    archive.pipe(output);
-    archive.append('Fallback README content', { name: 'README.md' });
-    await archive.finalize();
-    
-    return outputPath;
+    throw error;
   }
 }
