@@ -1,0 +1,27 @@
+{
+  "name": "gumroad-daily-flow",
+  "version": "1.0.0",
+  "description": "Automated daily cohesive digital product shop update for Gumroad using Gemini and Fal.ai",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "test": "ts-node src/index.ts --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.6.0",
+    "archiver": "^7.0.1",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "puppeteer": "^22.9.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.2",
+    "@types/node": "^20.12.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

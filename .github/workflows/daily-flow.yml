@@ -1,0 +1,43 @@
+name: Daily Gumroad Shop Generator
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Runs daily at 08:00 UTC (3:00 AM EST)
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+
+permissions:
+  contents: write # Allows committing the generated assets back to the repo
+
+jobs:
+  run-generator:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Creator Script
+        env:
+          GUMROAD_ACCESS_TOKEN: ${{ secrets.GUMROAD_ACCESS_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_BRANCH: 'main'
+        run: npx ts-node src/index.ts
+
+      - name: Commit and Push Generated Assets
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/
+          git commit -m "chore: add daily assets for $(date +'%Y-%m-%d')" || exit 0
+          git push

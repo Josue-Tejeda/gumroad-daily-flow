@@ -1,0 +1,106 @@
+[
+  {
+    "date": "2026-05-23",
+    "theme": "Retro Synthwave Neon",
+    "niche": "Fitness, Nutrition & Daily Wellness",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Retro Synthwave Neon",
+        "price": 0,
+        "productId": "mock_id_wallpaper_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-wallpaper-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/wallpaper.png",
+        "status": "published"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Retro Synthwave Neon",
+        "price": 299,
+        "productId": "mock_id_report_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-report-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/trend-report.pdf",
+        "status": "published"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Retro Synthwave Neon",
+        "price": 299,
+        "productId": "mock_id_code_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-code-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/code-boilerplate.zip",
+        "status": "published"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Retro Synthwave Neon",
+        "price": 0,
+        "productId": "mock_id_prompts_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-prompts-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/prompt-guide.pdf",
+        "status": "published"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Retro Synthwave Neon",
+        "price": 0,
+        "productId": "mock_id_planner_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-planner-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/printable-planner.pdf",
+        "status": "published"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-23",
+    "theme": "Retro Synthwave Neon",
+    "niche": "Fitness, Nutrition & Daily Wellness",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Retro Synthwave Neon",
+        "price": 0,
+        "productId": "mock_id_wallpaper_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-wallpaper-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/wallpaper.png",
+        "status": "published"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Retro Synthwave Neon",
+        "price": 299,
+        "productId": "mock_id_report_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-report-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/trend-report.pdf",
+        "status": "published"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Retro Synthwave Neon",
+        "price": 299,
+        "productId": "mock_id_code_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-code-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/code-boilerplate.zip",
+        "status": "published"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Retro Synthwave Neon",
+        "price": 0,
+        "productId": "mock_id_prompts_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-prompts-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/prompt-guide.pdf",
+        "status": "published"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Retro Synthwave Neon",
+        "price": 0,
+        "productId": "mock_id_planner_2026-05-23",
+        "gumroadUrl": "https://gum.co/mock-planner-2026-05-23",
+        "downloadUrl": "https://raw.githubusercontent.com/username/repo/main/assets/2026-05-23/printable-planner.pdf",
+        "status": "published"
+      }
+    ]
+  }
+]
