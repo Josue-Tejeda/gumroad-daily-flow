@@ -1,6 +1,58 @@
 [
   {
     "date": "2026-05-23",
+    "theme": "Abyssal Lumina Calm",
+    "niche": "Fitness, Nutrition & Daily Wellness",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Abyssal Lumina Calm",
+        "price": 0,
+        "productId": "nPhvMeCOUDrVk1zp-qzUbQ==",
+        "gumroadUrl": "https://tejedajoe.gumroad.com/l/adigzm",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/wallpaper.png",
+        "status": "draft"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Abyssal Lumina Calm",
+        "price": 299,
+        "productId": "Hkfp4riJ4wznEg4dZzRdtw==",
+        "gumroadUrl": "https://tejedajoe.gumroad.com/l/xfuhl",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/trend-report.pdf",
+        "status": "draft"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Abyssal Lumina Calm",
+        "price": 299,
+        "productId": "k2dhIakQLBAlSa_HGe-Qiw==",
+        "gumroadUrl": "https://tejedajoe.gumroad.com/l/elcep",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/code-boilerplate.zip",
+        "status": "draft"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Abyssal Lumina Calm",
+        "price": 0,
+        "productId": "aZ_QVF5DblAoGIAAlaUnsg==",
+        "gumroadUrl": "https://tejedajoe.gumroad.com/l/jzxfrm",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/prompt-guide.pdf",
+        "status": "draft"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Abyssal Lumina Calm",
+        "price": 0,
+        "productId": "c2ALWufPMZRUUfCcu67edw==",
+        "gumroadUrl": "https://tejedajoe.gumroad.com/l/ouqly",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/printable-planner.pdf",
+        "status": "draft"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-23",
     "theme": "Retro Synthwave Neon",
     "niche": "Fitness, Nutrition & Daily Wellness",
     "products": [
