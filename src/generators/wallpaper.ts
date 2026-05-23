@@ -1,18 +1,44 @@
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import { GoogleGenAI } from '@google/genai';
 import { DailyTheme } from '../types';
-import { FAL_KEY } from '../config';
+import { FAL_KEY, GEMINI_API_KEY } from '../config';
 
 export async function generateWallpaper(theme: DailyTheme, outputDir: string): Promise<string> {
   if (!FAL_KEY) {
     throw new Error('FAL_KEY is not defined in environment variables.');
   }
 
-  const prompt = `A premium, ultra-high-resolution desktop wallpaper, theme: "${theme.name}". 
+  let prompt = `A premium, ultra-high-resolution desktop wallpaper, theme: "${theme.name}". 
 Aesthetic details: ${theme.aesthetic}. 
 Visual style: clean digital art, modern composition, cinematic lighting, masterpiece, high details. 
 No text, no watermarks, no signatures. Aspect ratio 16:9. Color scheme: ${theme.colors.primary}, ${theme.colors.secondary}, with ${theme.colors.accent} highlights.`;
+
+  if (GEMINI_API_KEY) {
+    try {
+      console.log('Expanding wallpaper prompt using Gemini 2.5 Pro...');
+      const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+      const expansionResponse = await ai.models.generateContent({
+        model: 'gemini-2.5-pro',
+        contents: `You are an expert prompt designer for text-to-image models. Expand the daily theme into a highly descriptive, visually rich prompt for FLUX.1.
+Theme: ${theme.name}
+Description: ${theme.description}
+Aesthetic: ${theme.aesthetic}
+Keywords: ${theme.keywords.join(', ')}
+Target Colors: Primary (${theme.colors.primary}), Secondary (${theme.colors.secondary}), Accent (${theme.colors.accent}).
+
+Write a single paragraph (100-150 words) describing a stunning, high-end desktop wallpaper. Use concrete visual details, specify composition, lighting (e.g. volumetric, cinematic), camera specs, and color tones. Do not include introductory text, just return the raw prompt. Explicitly state "no text, no watermarks, no signatures, aspect ratio 16:9".`
+      });
+
+      if (expansionResponse.text) {
+        prompt = expansionResponse.text.trim();
+        console.log(`Expanded prompt successfully: "${prompt}"`);
+      }
+    } catch (err) {
+      console.warn('Failed to expand wallpaper prompt, using fallback base prompt:', err);
+    }
+  }
 
   console.log(`Generating wallpaper for theme: "${theme.name}" via Fal.ai...`);
 

@@ -64,10 +64,8 @@ export async function publishProduct(productId: string): Promise<boolean> {
 
   try {
     const response = await axios.put(
-      `${BASE_URL}/products/${productId}`,
-      {
-        published: true
-      },
+      `${BASE_URL}/products/${productId}/enable`,
+      {},
       {
         headers: {
           'Authorization': `Bearer ${GUMROAD_ACCESS_TOKEN}`,
@@ -76,12 +74,11 @@ export async function publishProduct(productId: string): Promise<boolean> {
       }
     );
 
-    const product = response.data?.product;
-    if (product && product.published) {
+    if (response.data?.success || response.status === 200) {
       console.log(`Gumroad API: Product ${productId} is now LIVE!`);
       return true;
     } else {
-      console.warn(`Gumroad API: PUT completed but product.published is false: ${JSON.stringify(response.data)}`);
+      console.warn(`Gumroad API: Enable completed but response did not indicate success: ${JSON.stringify(response.data)}`);
       return false;
     }
   } catch (error: any) {

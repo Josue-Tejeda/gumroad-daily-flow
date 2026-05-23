@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { DailyTheme } from '../types';
 import { GEMINI_API_KEY, ROTATING_NICHES } from '../config';
+import { cleanHtml, ensureContrast } from '../utils';
 
 export async function generateReport(theme: DailyTheme, outputDir: string, dayIndex: number): Promise<string> {
   if (!GEMINI_API_KEY) {
@@ -21,9 +22,15 @@ The theme/aesthetic style of the report is "${theme.name}" which is described as
 
 Generate the content in HTML format (ONLY the body content inside a container, do not include <html>, <head>, or <body> tags). Use headings (<h2>, <h3>), paragraphs (<p>), bullet lists (<ul>, <li>), tables (<table>, <tr>, <th>, <td>), and strong tags (<strong>) where appropriate.
 
+CRITICAL INSTRUCTIONS:
+- Do NOT include any inline CSS styles, style blocks, or background colors inside your tags.
+- Do NOT add a \`style\` attribute to any HTML element.
+- Do NOT wrap your output in markdown code blocks like \`\`\`html. Just return raw HTML.
+- Rely entirely on standard semantic HTML elements. The page styling and visual color theme are handled by our global stylesheet.
+
 The report must contain:
 1. A catchy Title (e.g. "The Rise of X: Niche Analysis") inside an <h1> tag.
-2. Executive Summary: What is changing in this niche right now? (Provide at least 2 hypothetical/actual metrics or percentages).
+2. Executive Summary: What is changing in this niche right now? (Provide at least 2 metrics or percentages).
 3. Core Trends Analysis: Identify and explain 3 key trends shaping this niche.
 4. Actionable Steps: Provide a bulleted list of 5 concrete recommendations for professionals or businesses to capitalize on these trends.
 
@@ -31,16 +38,24 @@ Write in a highly informative, premium, and professional tone. Avoid placeholder
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-pro',
       contents: prompt
     });
 
-    const reportContent = response.text || '';
-    if (!reportContent) {
+    let rawContent = response.text || '';
+    if (!rawContent) {
       throw new Error('Gemini API returned an empty text response for the report.');
     }
 
-    // HTML Page template with CSS styles using the theme's colors
+    // Clean Gemini's HTML to remove any stray backticks or inline styles
+    const reportContent = cleanHtml(rawContent);
+
+    // Compute contrast-safe text colors against the white (#ffffff) page background
+    const primaryColor = ensureContrast(theme.colors.primary, '#ffffff', 4.5);
+    const secondaryColor = ensureContrast(theme.colors.secondary, '#ffffff', 4.5);
+    const accentColor = ensureContrast(theme.colors.accent, '#ffffff', 4.5);
+
+    // HTML Page template with CSS styles forcing a light, high-contrast, full-bleed design
     const fullHtml = `
 <!DOCTYPE html>
 <html lang="en">
@@ -48,26 +63,29 @@ Write in a highly informative, premium, and professional tone. Avoid placeholder
   <meta charset="UTF-8">
   <title>${theme.name} Trend Report</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
     
     body {
       font-family: 'Outfit', sans-serif;
-      background-color: ${theme.colors.background};
-      color: ${theme.colors.text};
+      background-color: #ffffff;
+      color: #1e293b; /* High-contrast dark slate body text */
       margin: 0;
       padding: 0;
       line-height: 1.6;
+      -webkit-print-color-adjust: exact;
     }
     
     .report-container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 40px;
+      padding: 60px 40px;
       box-sizing: border-box;
+      min-height: 297mm; /* Fills standard A4 height to prevent background cutoffs */
+      background-color: #ffffff;
     }
     
     header {
-      border-bottom: 2px solid ${theme.colors.primary};
+      border-bottom: 2px solid ${primaryColor};
       padding-bottom: 20px;
       margin-bottom: 40px;
       display: flex;
@@ -79,40 +97,42 @@ Write in a highly informative, premium, and professional tone. Avoid placeholder
       font-size: 0.9rem;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: ${theme.colors.secondary};
+      color: ${secondaryColor};
       font-weight: 600;
     }
     
     header .meta-date {
       font-size: 0.9rem;
-      color: ${theme.colors.text}88;
+      color: #64748b;
     }
     
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.8rem;
-      color: ${theme.colors.primary};
+      font-family: 'Lora', serif;
+      font-size: 2.6rem;
+      color: ${primaryColor};
       margin-top: 0;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-weight: 700;
       line-height: 1.2;
     }
     
     h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      color: ${theme.colors.secondary};
-      margin-top: 30px;
+      font-family: 'Lora', serif;
+      font-size: 1.7rem;
+      color: ${secondaryColor};
+      margin-top: 35px;
       margin-bottom: 15px;
-      border-bottom: 1px dashed ${theme.colors.secondary}44;
+      border-bottom: 1px dashed ${secondaryColor}44;
       padding-bottom: 8px;
+      page-break-after: avoid; /* Prevents orphaned headers at bottom of page */
     }
     
     h3 {
       font-size: 1.2rem;
-      color: ${theme.colors.primary};
-      margin-top: 20px;
+      color: ${primaryColor};
+      margin-top: 25px;
       margin-bottom: 10px;
+      page-break-after: avoid;
     }
     
     p {
@@ -138,8 +158,8 @@ Write in a highly informative, premium, and professional tone. Avoid placeholder
     }
     
     th {
-      background-color: ${theme.colors.primary};
-      color: ${theme.colors.background};
+      background-color: ${primaryColor};
+      color: #ffffff;
       text-align: left;
       padding: 12px;
       font-weight: 600;
@@ -147,34 +167,35 @@ Write in a highly informative, premium, and professional tone. Avoid placeholder
     
     td {
       padding: 12px;
-      border-bottom: 1px solid ${theme.colors.secondary}22;
+      border-bottom: 1px solid #e2e8f0;
     }
     
     tr:nth-child(even) {
-      background-color: ${theme.colors.secondary}0d;
+      background-color: #f8fafc;
     }
     
     .accent-callout {
-      background-color: ${theme.colors.accent}15;
-      border-left: 4px solid ${theme.colors.accent};
+      background-color: ${accentColor}0a;
+      border-left: 4px solid ${accentColor};
       padding: 20px;
       margin: 30px 0;
       border-radius: 0 8px 8px 0;
+      page-break-inside: avoid;
     }
     
     .accent-callout p {
       margin: 0;
       font-style: italic;
-      color: ${theme.colors.text};
+      color: #334155;
     }
     
     footer {
       margin-top: 60px;
-      border-top: 1px solid ${theme.colors.secondary}44;
+      border-top: 1px solid #e2e8f0;
       padding-top: 20px;
       text-align: center;
       font-size: 0.85rem;
-      color: ${theme.colors.text}88;
+      color: #64748b;
     }
   </style>
 </head>
@@ -210,14 +231,16 @@ Write in a highly informative, premium, and professional tone. Avoid placeholder
     });
     const page = await browser.newPage();
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
+    
+    // Output full bleed A4 page print with zero margin offset
     await page.pdf({
       path: outputPath,
       format: 'A4',
       margin: {
-        top: '15mm',
-        bottom: '15mm',
-        left: '15mm',
-        right: '15mm'
+        top: '0px',
+        bottom: '0px',
+        left: '0px',
+        right: '0px'
       },
       printBackground: true
     });

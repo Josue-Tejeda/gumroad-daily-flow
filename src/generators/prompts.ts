@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { DailyTheme } from '../types';
 import { GEMINI_API_KEY } from '../config';
+import { cleanHtml, ensureContrast } from '../utils';
 
 export async function generatePrompts(theme: DailyTheme, outputDir: string): Promise<string> {
   if (!GEMINI_API_KEY) {
@@ -18,6 +19,12 @@ export async function generatePrompts(theme: DailyTheme, outputDir: string): Pro
 
 Generate the content in HTML format (ONLY the body content inside a container, do not include <html>, <head>, or <body> tags). Use headings (<h2>, <h3>), paragraphs (<p>), code blocks (<pre><code>), lists (<ul>, <li>), and strong tags (<strong>).
 
+CRITICAL INSTRUCTIONS:
+- Do NOT include any inline CSS styles, style blocks, or background colors inside your HTML tags.
+- Do NOT add a \`style\` attribute to any HTML element.
+- Do NOT wrap your output in markdown code blocks like \`\`\`html. Just return raw HTML.
+- Rely entirely on standard semantic HTML elements. The page styling and visual color theme are handled by our global stylesheet.
+
 The guide must contain:
 1. An <h1> title matching the theme (e.g. "Creative Prompts for ${theme.name}").
 2. Introduction: Briefly explain how these prompts unlock creative work related to the theme.
@@ -29,14 +36,21 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-pro',
       contents: prompt
     });
 
-    const promptGuideContent = response.text || '';
-    if (!promptGuideContent) {
+    const rawContent = response.text || '';
+    if (!rawContent) {
       throw new Error('Gemini API returned empty text response for the prompt pack.');
     }
+
+    const promptGuideContent = cleanHtml(rawContent);
+
+    // Compute contrast-safe colors
+    const primaryColor = ensureContrast(theme.colors.primary, '#ffffff', 4.5);
+    const secondaryColor = ensureContrast(theme.colors.secondary, '#ffffff', 4.5);
+    const accentColor = ensureContrast(theme.colors.accent, '#ffffff', 4.5);
 
     // HTML Page template with CSS styles using the theme's colors
     const fullHtml = `
@@ -50,22 +64,25 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
     
     body {
       font-family: 'Outfit', sans-serif;
-      background-color: ${theme.colors.background};
-      color: ${theme.colors.text};
+      background-color: #ffffff;
+      color: #1e293b; /* High-contrast dark slate body text */
       margin: 0;
       padding: 0;
       line-height: 1.6;
+      -webkit-print-color-adjust: exact;
     }
     
-    .report-container {
+    .prompt-container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 40px;
+      padding: 60px 40px;
       box-sizing: border-box;
+      min-height: 297mm; /* A4 size height */
+      background-color: #ffffff;
     }
     
     header {
-      border-bottom: 2px solid ${theme.colors.primary};
+      border-bottom: 2px solid ${primaryColor};
       padding-bottom: 20px;
       margin-bottom: 40px;
       display: flex;
@@ -77,19 +94,19 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
       font-size: 0.9rem;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: ${theme.colors.secondary};
+      color: ${secondaryColor};
       font-weight: 600;
     }
     
     header .meta-date {
       font-size: 0.9rem;
-      color: ${theme.colors.text}88;
+      color: #64748b;
     }
     
     h1 {
       font-family: 'Playfair Display', serif;
       font-size: 2.8rem;
-      color: ${theme.colors.primary};
+      color: ${primaryColor};
       margin-top: 0;
       margin-bottom: 10px;
       font-weight: 700;
@@ -99,18 +116,20 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
     h2 {
       font-family: 'Playfair Display', serif;
       font-size: 1.8rem;
-      color: ${theme.colors.secondary};
+      color: ${secondaryColor};
       margin-top: 30px;
       margin-bottom: 15px;
-      border-bottom: 1px dashed ${theme.colors.secondary}44;
+      border-bottom: 1px dashed ${secondaryColor}44;
       padding-bottom: 8px;
+      page-break-after: avoid;
     }
     
     h3 {
       font-size: 1.25rem;
-      color: ${theme.colors.primary};
+      color: ${primaryColor};
       margin-top: 25px;
       margin-bottom: 10px;
+      page-break-after: avoid;
     }
     
     p {
@@ -129,42 +148,38 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
     }
     
     pre {
-      background-color: ${theme.colors.text}10;
-      border-left: 4px solid ${theme.colors.primary};
+      background-color: #f8fafc;
+      border-left: 4px solid ${primaryColor};
+      border: 1px solid #e2e8f0;
+      border-left-width: 4px;
+      border-left-color: ${primaryColor};
       padding: 15px;
       border-radius: 4px;
       overflow-x: auto;
       margin: 15px 0;
+      page-break-inside: avoid;
     }
     
     code {
       font-family: 'Fira Code', monospace;
       font-size: 0.95rem;
-      color: ${theme.colors.text};
+      color: #0f172a;
       white-space: pre-wrap;
       word-break: break-all;
     }
     
-    .prompt-box {
-      margin-bottom: 40px;
-      border: 1px solid ${theme.colors.secondary}33;
-      padding: 20px;
-      border-radius: 8px;
-      background-color: ${theme.colors.background};
-    }
-    
     footer {
       margin-top: 60px;
-      border-top: 1px solid ${theme.colors.secondary}44;
+      border-top: 1px solid #e2e8f0;
       padding-top: 20px;
       text-align: center;
       font-size: 0.85rem;
-      color: ${theme.colors.text}88;
+      color: #64748b;
     }
   </style>
 </head>
 <body>
-  <div class="report-container">
+  <div class="prompt-container">
     <header>
       <div class="meta-theme">Theme: ${theme.name}</div>
       <div class="meta-date">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
@@ -191,14 +206,16 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
     });
     const page = await browser.newPage();
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
+    
+    // Output full bleed A4 page print with zero margin offset
     await page.pdf({
       path: outputPath,
       format: 'A4',
       margin: {
-        top: '15mm',
-        bottom: '15mm',
-        left: '15mm',
-        right: '15mm'
+        top: '0px',
+        bottom: '0px',
+        left: '0px',
+        right: '0px'
       },
       printBackground: true
     });
@@ -213,3 +230,4 @@ Wrap the actual copy-pasteable prompt text inside <pre><code> tags so it is easy
     return outputPath;
   }
 }
+
