@@ -153,10 +153,11 @@ async function run() {
           status: published ? 'published' : 'draft'
         });
       } catch (err: any) {
-        console.error(`Failed to publish product ${product.name} to Gumroad:`, err.message);
+        const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+        console.error(`Failed to publish product ${product.name} to Gumroad:`, errorDetails);
         publishedResults.push({
           ...product,
-          gumroadUrl: 'FAILED_TO_PUBLISH',
+          gumroadUrl: `FAILED: ${errorDetails}`,
           productId: 'FAILED',
           status: 'error'
         });
