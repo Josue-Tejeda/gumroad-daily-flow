@@ -1,6 +1,58 @@
 [
   {
     "date": "2026-05-23",
+    "theme": "Retro Future Minimalist",
+    "niche": "Fitness, Nutrition & Daily Wellness",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Retro Future Minimalist",
+        "price": 0,
+        "productId": "ckUV0AD1wWjDaQEoMACwyA==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/tqucg",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/wallpaper.png",
+        "status": "published"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Retro Future Minimalist",
+        "price": 299,
+        "productId": "fxgocqHEuZP_6C1ugaE3_A==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/grhus",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/trend-report.pdf",
+        "status": "published"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Retro Future Minimalist",
+        "price": 299,
+        "productId": "NVGExnRCc_UBYICenCPYsw==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/bnatu",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/code-boilerplate.zip",
+        "status": "published"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Retro Future Minimalist",
+        "price": 0,
+        "productId": "mq0ZVuHoa6HaEs0q78N9bw==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/nmuxzi",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/prompt-guide.pdf",
+        "status": "published"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Retro Future Minimalist",
+        "price": 0,
+        "productId": "HeBz_6NYS_OFIYb5ij6shA==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/tbgdw",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/printable-planner.pdf",
+        "status": "published"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-23",
     "theme": "Abyssal Lumina Calm",
     "niche": "Fitness, Nutrition & Daily Wellness",
     "products": [
