@@ -1,6 +1,58 @@
 [
   {
     "date": "2026-05-23",
+    "theme": "Chromewave Dusk",
+    "niche": "Fitness, Nutrition & Daily Wellness",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Chromewave Dusk",
+        "price": 0,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED_TO_PUBLISH",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/wallpaper.png",
+        "status": "error"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Chromewave Dusk",
+        "price": 299,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED_TO_PUBLISH",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/trend-report.pdf",
+        "status": "error"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Chromewave Dusk",
+        "price": 299,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED_TO_PUBLISH",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/code-boilerplate.zip",
+        "status": "error"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Chromewave Dusk",
+        "price": 0,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED_TO_PUBLISH",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/prompt-guide.pdf",
+        "status": "error"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Chromewave Dusk",
+        "price": 0,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED_TO_PUBLISH",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-23/printable-planner.pdf",
+        "status": "error"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-23",
     "theme": "Retro Future Minimalist",
     "niche": "Fitness, Nutrition & Daily Wellness",
     "products": [
