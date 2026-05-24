@@ -1,6 +1,58 @@
 [
   {
     "date": "2026-05-24",
+    "theme": "Neo-Brutal Grid",
+    "niche": "Productivity & Time Management",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Neo-Brutal Grid",
+        "price": 0,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED: Gumroad API Error: Gumroad API returned success but product object was missing or invalid: {\"success\":false,\"message\":\"Sorry, you can only create 10 products per day.\"}",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-24/wallpaper.png",
+        "status": "error"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Neo-Brutal Grid",
+        "price": 299,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED: Gumroad API Error: Gumroad API returned success but product object was missing or invalid: {\"success\":false,\"message\":\"Sorry, you can only create 10 products per day.\"}",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-24/trend-report.pdf",
+        "status": "error"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Neo-Brutal Grid",
+        "price": 299,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED: Gumroad API Error: Gumroad API returned success but product object was missing or invalid: {\"success\":false,\"message\":\"Sorry, you can only create 10 products per day.\"}",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-24/code-boilerplate.zip",
+        "status": "error"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Neo-Brutal Grid",
+        "price": 0,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED: Gumroad API Error: Gumroad API returned success but product object was missing or invalid: {\"success\":false,\"message\":\"Sorry, you can only create 10 products per day.\"}",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-24/prompt-guide.pdf",
+        "status": "error"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Neo-Brutal Grid",
+        "price": 0,
+        "productId": "FAILED",
+        "gumroadUrl": "FAILED: Gumroad API Error: Gumroad API returned success but product object was missing or invalid: {\"success\":false,\"message\":\"Sorry, you can only create 10 products per day.\"}",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-24/printable-planner.pdf",
+        "status": "error"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-24",
     "theme": "Sundried Clay & Desert Bloom",
     "niche": "Productivity & Time Management",
     "products": [
