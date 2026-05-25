@@ -1,5 +1,57 @@
 [
   {
+    "date": "2026-05-25",
+    "theme": "Fireside Hygge Retreat",
+    "niche": "Technology & Software Trends",
+    "products": [
+      {
+        "type": "wallpaper",
+        "name": "Daily Cohesive Aesthetic Wallpaper - Fireside Hygge Retreat",
+        "price": 0,
+        "productId": "iRfAz4F2epo8NUQZUo4VUg==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/liwtlb",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-25/wallpaper.png",
+        "status": "published"
+      },
+      {
+        "type": "report",
+        "name": "Daily Cohesive Trend Report & News Digest - Fireside Hygge Retreat",
+        "price": 299,
+        "productId": "sWBCT04ZjakrFQ_5R2B38g==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/quoxaw",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-25/trend-report.pdf",
+        "status": "published"
+      },
+      {
+        "type": "code",
+        "name": "Daily Cohesive Code Boilerplate & UI Kit - Fireside Hygge Retreat",
+        "price": 299,
+        "productId": "vrUt9_bDLTkjxSGR6KRxVw==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/qhqrup",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-25/code-boilerplate.zip",
+        "status": "published"
+      },
+      {
+        "type": "prompts",
+        "name": "Daily Cohesive AI Prompt Recipe Pack - Fireside Hygge Retreat",
+        "price": 0,
+        "productId": "ZHA4hahiIWM6h2NgRnPstg==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/jvbbe",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-25/prompt-guide.pdf",
+        "status": "published"
+      },
+      {
+        "type": "planner",
+        "name": "Daily Cohesive Printable Planner & Log - Fireside Hygge Retreat",
+        "price": 0,
+        "productId": "qJxGwDpot6It6Jumc_F8Tw==",
+        "gumroadUrl": "https://day2dayflow.gumroad.com/l/iyooyx",
+        "downloadUrl": "https://raw.githubusercontent.com/Josue-Tejeda/gumroad-daily-flow/main/assets/2026-05-25/printable-planner.pdf",
+        "status": "published"
+      }
+    ]
+  },
+  {
     "date": "2026-05-24",
     "theme": "Neo-Brutal Grid",
     "niche": "Productivity & Time Management",
